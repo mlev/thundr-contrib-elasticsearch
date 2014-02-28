@@ -1,0 +1,15 @@
+[2014-02-28 16:31:12,553][INFO ][node                     ] [Cagliostro] version[1.0.1], pid[56446], build[5c03844/2014-02-25T15:52:53Z]
+[2014-02-28 16:31:12,553][INFO ][node                     ] [Cagliostro] initializing ...
+[2014-02-28 16:31:12,556][INFO ][plugins                  ] [Cagliostro] loaded [], sites []
+[2014-02-28 16:31:14,533][INFO ][node                     ] [Cagliostro] initialized
+[2014-02-28 16:31:14,534][INFO ][node                     ] [Cagliostro] starting ...
+[2014-02-28 16:31:14,618][INFO ][transport                ] [Cagliostro] bound_address {inet[/0:0:0:0:0:0:0:0:9300]}, publish_address {inet[/10.0.0.2:9300]}
+[2014-02-28 16:31:17,646][INFO ][cluster.service          ] [Cagliostro] new_master [Cagliostro][TswdRlfASf-HEMD3QIO9_g][localhost][inet[/10.0.0.2:9300]], reason: zen-disco-join (elected_as_master)
+[2014-02-28 16:31:17,665][INFO ][discovery                ] [Cagliostro] elasticsearch/TswdRlfASf-HEMD3QIO9_g
+[2014-02-28 16:31:17,676][INFO ][http                     ] [Cagliostro] bound_address {inet[/0:0:0:0:0:0:0:0:9200]}, publish_address {inet[/10.0.0.2:9200]}
+[2014-02-28 16:31:17,696][INFO ][gateway                  ] [Cagliostro] recovered [0] indices into cluster_state
+[2014-02-28 16:31:17,696][INFO ][node                     ] [Cagliostro] started
+[2014-02-28 16:31:26,947][INFO ][node                     ] [Cagliostro] stopping ...
+[2014-02-28 16:31:26,962][INFO ][node                     ] [Cagliostro] stopped
+[2014-02-28 16:31:26,962][INFO ][node                     ] [Cagliostro] closing ...
+[2014-02-28 16:31:26,970][INFO ][node                     ] [Cagliostro] closed
