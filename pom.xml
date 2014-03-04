@@ -11,7 +11,7 @@
     <artifactId>thundr-gae-es</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>thundr-gae-es-client</name>
+    <name>thundr-gae-es</name>
     <description>A Thundr module implementing an Elastic Search client for Google App Engine</description>
     <url>http://3wks.github.com/thundr/</url>
 
