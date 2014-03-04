@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>thundr-gae-es</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>thundr-gae-es</name>
     <description>A Thundr module implementing an Elastic Search client for Google App Engine</description>
@@ -25,6 +25,13 @@
             <email>dave@3wks.com.au</email>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/3wks/${project.name}</connection>
+        <developerConnection>scm:git:https://github.com/3wks/${project.name}</developerConnection>
+        <url>https://github.com/3wks/${project.name}</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -146,8 +153,4 @@
     </build>
 
     <modelVersion>4.0.0</modelVersion>
-
-  <scm>
-    <tag>0.0.1</tag>
-  </scm>
 </project>
