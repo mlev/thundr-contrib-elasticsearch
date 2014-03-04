@@ -152,7 +152,7 @@ public class ElasticSearchClient {
 		applyAuthIfRequired(request);
 		appendDataToRequest(request, query);
 
-		HttpResponse response = request.get();
+		HttpResponse response = request.post();
 		return gson.fromJson(response.getBody(), new SearchResultOfType<T>(entityType));
 	}
 

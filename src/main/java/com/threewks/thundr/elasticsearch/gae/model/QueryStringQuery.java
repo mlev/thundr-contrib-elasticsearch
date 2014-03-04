@@ -17,25 +17,18 @@
  */
 package com.threewks.thundr.elasticsearch.gae.model;
 
+import com.google.common.collect.Maps;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Map;
 
-public class Hits<T> {
-	private int total;
-	@SerializedName("max_score")
-	private double maxScore;
-	private List<Hit<T>> hits;
+public class QueryStringQuery implements BaseQuery {
+	@SerializedName("query_string")
+	private Map<String, Object> queryString = Maps.newHashMap();
 
-	public int getTotal() {
-		return total;
-	}
-
-	public double getMaxScore() {
-		return maxScore;
-	}
-
-	public List<Hit<T>> getHits() {
-		return hits;
+	public QueryStringQuery(String query, List<String> fields) {
+		queryString.put("query", query);
+		queryString.put("fields", fields);
 	}
 }

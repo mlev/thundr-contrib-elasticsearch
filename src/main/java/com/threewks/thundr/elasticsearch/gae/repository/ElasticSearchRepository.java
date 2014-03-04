@@ -1,40 +1,56 @@
+/*
+ * This file is a component of thundr, a software library from 3wks.
+ * Read more: http://www.3wks.com.au/thundr
+ * Copyright (C) 2013 3wks, <thundr@3wks.com.au>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.threewks.thundr.elasticsearch.gae.repository;
 
 import com.google.common.collect.Lists;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
-import com.threewks.thundr.elasticsearch.gae.model.Hit;
-import com.threewks.thundr.elasticsearch.gae.model.IndexResult;
-import com.threewks.thundr.elasticsearch.gae.model.Query;
-import com.threewks.thundr.elasticsearch.gae.model.SearchResult;
+import com.threewks.thundr.elasticsearch.gae.model.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
 	private final ElasticSearchClient client;
 	private final String index;
 	private final Class<E> entityType;
+	private final List<String> searchFields;
+	private final String typeName;
 
-	public ElasticSearchRepository(ElasticSearchClient client, String index, Class<E> entityType) {
+	public ElasticSearchRepository(ElasticSearchClient client, String index, Class<E> entityType, List<String> searchFields) {
 		this.client = client;
 		this.index = index;
 		this.entityType = entityType;
+		this.searchFields = searchFields;
+		typeName = entityType.getSimpleName().toLowerCase();
 	}
 
 	public E load(String id) {
-		Hit<E> result = client.get(entityType, index, entityType.getName(), id);
+		Hit<E> result = client.get(entityType, index, typeName, id);
 		return result.getSource();
 	}
 
 	public boolean save(E entity) {
 		IndexResult result;
 		String id = entity.getId();
-		String type = entityType.getName();
 		if (load(id) == null) {
-			result = client.index(index, type, id, entity);
+			result = client.index(index, typeName, id, entity);
 		} else {
-			result = client.update(index, type, id, entity);
+			result = client.update(index, typeName, id, entity);
 		}
 		return result.isCreated();
 	}
@@ -51,7 +67,7 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public void delete(E entity) {
-		client.delete(index, entityType.getName(), entity.getId());
+		client.delete(index, typeName, entity.getId());
 	}
 
 	public void delete(E... entities) {
@@ -65,11 +81,13 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 		}
 	}
 
-	public List<E> search(Map<String, Object> query) {
-		List<E> entities = Lists.newArrayList();
+	public List<E> search(final String query) {
+		return search(new Query(new QueryStringQuery(query, searchFields)));
+	}
 
-		Query elasticSearchQuery = new Query(query);
-		SearchResult<E> result = client.search(entityType, index, entityType.getName(), elasticSearchQuery);
+	public List<E> search(Query query) {
+		List<E> entities = Lists.newArrayList();
+		SearchResult<E> result = client.search(entityType, index, typeName, query);
 		for (Hit<E> hit : result.getHits().getHits()) {
 			entities.add(hit.getSource());
 		}
