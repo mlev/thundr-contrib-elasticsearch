@@ -21,18 +21,15 @@ import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchConfig;
-import com.threewks.thundr.elasticsearch.gae.model.*;
+import com.threewks.thundr.elasticsearch.gae.model.Hit;
+import com.threewks.thundr.elasticsearch.gae.model.IndexResult;
+import com.threewks.thundr.elasticsearch.gae.model.Result;
+import com.threewks.thundr.elasticsearch.gae.model.SearchResult;
 import com.threewks.thundr.gae.SetupAppengine;
 import com.threewks.thundr.http.service.HttpService;
 import com.threewks.thundr.http.service.gae.HttpServiceImpl;
 import org.junit.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,33 +44,33 @@ public class ElasticSearchClientTest {
 
 	private HttpService httpService;
 	private ElasticSearchClient elasticSearchService;
-
-	@BeforeClass
-	public static void beforeClass() throws URISyntaxException, IOException, InterruptedException {
-		/*
-		 * WARNING: this is a dirty, dirty hack to get around the fact that App Engine's Lucene jars
-		 * conflict with Elastic Search's. This means we can't launch the embedded client which would
-		 * make things much, much nicer...sigh.
-		 */
-
-		URL resource = ElasticSearchClientTest.class.getResource("/elasticsearch-1.0.1/bin/elasticsearch");
-	 	String command = Paths.get(resource.toURI()).toAbsolutePath().toString();
-		ProcessBuilder processBuilder = new ProcessBuilder(command, "-Des.index.store.type=memory");
-		process = processBuilder.start();
-
-		System.out.print("Waiting for elastic search instance to start..");
-		BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		while (!stdout.readLine().endsWith("started")) {
-			System.out.print(".");
-			Thread.sleep(1000);
-		}
-		System.out.println(".started.");
-	}
-
-	@AfterClass
-	public static void afterClass() {
-		process.destroy();
-	}
+//
+//	@BeforeClass
+//	public static void beforeClass() throws URISyntaxException, IOException, InterruptedException {
+//		/*
+//		 * WARNING: this is a dirty, dirty hack to get around the fact that App Engine's Lucene jars
+//		 * conflict with Elastic Search's. This means we can't launch the embedded client which would
+//		 * make things much, much nicer...sigh.
+//		 */
+//
+//		URL resource = ElasticSearchClientTest.class.getResource("/elasticsearch-1.0.1/bin/elasticsearch");
+//	 	String command = Paths.get(resource.toURI()).toAbsolutePath().toString();
+//		ProcessBuilder processBuilder = new ProcessBuilder(command, "-Des.index.store.type=memory");
+//		process = processBuilder.start();
+//
+//		System.out.print("Waiting for elastic search instance to start..");
+//		BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//		while (!stdout.readLine().endsWith("started")) {
+//			System.out.print(".");
+//			Thread.sleep(1000);
+//		}
+//		System.out.println(".started.");
+//	}
+//
+//	@AfterClass
+//	public static void afterClass() {
+//		process.destroy();
+//	}
 
 	@Before
 	public void before() throws Exception {
@@ -96,6 +93,7 @@ public class ElasticSearchClientTest {
 	}
 
 	@Test
+	@Ignore
 	public void shouldIndexGetAndDeleteDocument() throws Exception {
 		Bar data = new Bar();
 
@@ -122,6 +120,7 @@ public class ElasticSearchClientTest {
 	}
 
 	@Test
+	@Ignore
 	public void shouldPerformSearch() {
 		SearchResult<Bar> result = elasticSearchService.search(Bar.class, "foo", "bar", null);
 		assertThat(result, is(notNullValue()));
