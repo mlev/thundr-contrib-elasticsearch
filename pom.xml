@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>thundr-gae-es</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>thundr-gae-es-client</name>
     <description>A Thundr module implementing an Elastic Search client for Google App Engine</description>

@@ -15,16 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.threewks.thundr.elasticsearch.gae.service;
+package com.threewks.thundr.elasticsearch.gae.model;
 
-import com.threewks.thundr.http.service.HttpResponse;
+public class Result {
+	private String _index;
+	private String _type;
+	private String _id;
+	private Integer _version;
+	private Boolean found;
 
-import java.util.HashMap;
+	public String getIndex() {
+		return _index;
+	}
 
-public class ElasticSearchResult extends HashMap<String, Object> {
-	HttpResponse httpResponse;
+	public String getType() {
+		return _type;
+	}
 
-	public HttpResponse getHttpResponse() {
-		return httpResponse;
+	public String getId() {
+		return _id;
+	}
+
+	public Integer getVersion() {
+		return _version;
+	}
+
+	public Boolean isFound() {
+		return found;
 	}
 }

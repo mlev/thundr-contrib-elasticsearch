@@ -19,7 +19,9 @@ package com.threewks.thundr.elasticsearch.gae.service;
 
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.google.common.collect.Maps;
+import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
+import com.threewks.thundr.elasticsearch.gae.ElasticSearchConfig;
+import com.threewks.thundr.elasticsearch.gae.model.*;
 import com.threewks.thundr.gae.SetupAppengine;
 import com.threewks.thundr.http.service.HttpService;
 import com.threewks.thundr.http.service.gae.HttpServiceImpl;
@@ -31,20 +33,20 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
-public class ElasticSearchServiceTest {
+public class ElasticSearchClientTest {
 	private static Process process;
 
 	@Rule
 	public SetupAppengine setupAppengine = new SetupAppengine();
 
 	private HttpService httpService;
-	private ElasticSearchService elasticSearchService;
+	private ElasticSearchClient elasticSearchService;
 
 	@BeforeClass
 	public static void beforeClass() throws URISyntaxException, IOException, InterruptedException {
@@ -54,7 +56,7 @@ public class ElasticSearchServiceTest {
 		 * make things much, much nicer...sigh.
 		 */
 
-		URL resource = ElasticSearchServiceTest.class.getResource("/elasticsearch-1.0.1/bin/elasticsearch");
+		URL resource = ElasticSearchClientTest.class.getResource("/elasticsearch-1.0.1/bin/elasticsearch");
 	 	String command = Paths.get(resource.toURI()).toAbsolutePath().toString();
 		ProcessBuilder processBuilder = new ProcessBuilder(command, "-Des.index.store.type=memory");
 		process = processBuilder.start();
@@ -81,36 +83,51 @@ public class ElasticSearchServiceTest {
 		ElasticSearchConfig config = new ElasticSearchConfig();
 		config.setUrl("http://localhost:9200");
 
-		elasticSearchService = new ElasticSearchService(httpService, config);
+		elasticSearchService = new ElasticSearchClient(httpService, config);
+
+		for (int i = 0; i < 10; i++) {
+			elasticSearchService.index("foo", "bar", UUID.randomUUID().toString(), new Bar(), true);
+		}
 	}
 
-	@Test
-	public void shouldGetResponseFromRoot() throws Exception {
-		ElasticSearchResult result = elasticSearchService.get("/");
-		assertThat(result, is(notNullValue()));
-		assertThat(result.getHttpResponse(), is(notNullValue()));
-		assertThat(result, hasKey("status"));
-		assertThat((Double) result.get("status"), is(200d));
-		assertThat(result.get("version"), is(instanceOf(Map.class)));
+	@After
+	public void after() throws Exception {
+		elasticSearchService.delete("foo");
 	}
 
 	@Test
 	public void shouldIndexGetAndDeleteDocument() throws Exception {
-		Map<String, Object> data = Maps.newHashMap();
-		data.put("baz", "qux");
+		Bar data = new Bar();
 
 		String id = UUID.randomUUID().toString();
-		ElasticSearchResult result = elasticSearchService.index("foo", "bar", id, data);
-		assertThat(result, is(notNullValue()));
-		assertThat((String) result.get("_index"), is("foo"));
-		assertThat((String) result.get("_type"), is("bar"));
-		assertThat((Boolean) result.get("created"), is(true));
+		IndexResult indexResult = elasticSearchService.index("foo", "bar", id, data);
+		assertThat(indexResult, is(notNullValue()));
+		assertThat(indexResult.getIndex(), is("foo"));
+		assertThat(indexResult.getType(), is("bar"));
+		assertThat(indexResult.isCreated(), is(true));
 
-		result = elasticSearchService.get("foo", "bar", id);
-		assertThat(result, is(notNullValue()));
-		assertThat((String) result.get("_id"), is(id));
+		Hit<Bar> getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
+		assertThat(getResult, is(notNullValue()));
+		assertThat(getResult.getId(), is(id));
+		assertThat(getResult.isFound(), is(true));
+		assertThat(getResult.getSource().baz, is("qux"));
 
-		Map<String, Object> source = (Map<String, Object> ) result.get("_source");
-		assertThat((String) source.get("baz"), is("qux"));
+		Result deleteResult = elasticSearchService.delete("foo", "bar", id);
+		assertThat(deleteResult, is(notNullValue()));
+		assertThat(deleteResult.isFound(), is(true));
+
+		getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
+		assertThat(getResult.getId(), is(id));
+		assertThat(getResult.isFound(), is(false));
+	}
+
+	@Test
+	public void shouldPerformSearch() {
+		SearchResult<Bar> result = elasticSearchService.search(Bar.class, "foo", "bar", null);
+		assertThat(result, is(notNullValue()));
+	}
+
+	class Bar {
+		String baz = "qux";
 	}
 }

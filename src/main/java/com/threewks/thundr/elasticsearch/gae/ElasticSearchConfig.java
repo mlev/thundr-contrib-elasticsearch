@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.threewks.thundr.elasticsearch.gae.service;
+package com.threewks.thundr.elasticsearch.gae;
 
 import com.threewks.thundr.elasticsearch.gae.auth.AuthenticationStrategy;
 

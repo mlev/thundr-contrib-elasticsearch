@@ -19,7 +19,6 @@ package com.threewks.thundr.elasticsearch.gae;
 
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.threewks.thundr.elasticsearch.gae.service.ElasticSearchService;
 import com.threewks.thundr.gae.GaeModule;
 import com.threewks.thundr.http.service.HttpService;
 import com.threewks.thundr.http.service.gae.HttpServiceImpl;
@@ -39,6 +38,11 @@ public class ElasticSearchGaeModule extends BaseModule {
 		super.configure(injectionContext);
 		injectionContext.inject(URLFetchServiceFactory.getURLFetchService()).as(URLFetchService.class);
 		injectionContext.inject(HttpServiceImpl.class).as(HttpService.class);
-		injectionContext.inject(ElasticSearchService.class).as(ElasticSearchService.class);
+
+		ElasticSearchConfig config = new ElasticSearchConfig();
+		config.setUrl(injectionContext.get(String.class, "elasticSearchUrl"));
+		injectionContext.inject(config).as(ElasticSearchConfig.class);
+
+		injectionContext.inject(ElasticSearchClient.class).as(ElasticSearchClient.class);
 	}
 }
