@@ -17,24 +17,10 @@
  */
 package com.threewks.thundr.elasticsearch.gae.service;
 
-import com.google.appengine.api.urlfetch.URLFetchService;
-import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
-import com.threewks.thundr.elasticsearch.gae.ElasticSearchConfig;
-import com.threewks.thundr.elasticsearch.gae.model.Hit;
-import com.threewks.thundr.elasticsearch.gae.model.IndexResult;
-import com.threewks.thundr.elasticsearch.gae.model.Result;
-import com.threewks.thundr.elasticsearch.gae.model.SearchResult;
 import com.threewks.thundr.gae.SetupAppengine;
 import com.threewks.thundr.http.service.HttpService;
-import com.threewks.thundr.http.service.gae.HttpServiceImpl;
 import org.junit.*;
-
-import java.util.UUID;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 public class ElasticSearchClientTest {
 	private static Process process;
@@ -74,56 +60,56 @@ public class ElasticSearchClientTest {
 
 	@Before
 	public void before() throws Exception {
-		URLFetchService urlFetchService = URLFetchServiceFactory.getURLFetchService();
-		httpService = new HttpServiceImpl(urlFetchService);
-
-		ElasticSearchConfig config = new ElasticSearchConfig();
-		config.setUrl("http://localhost:9200");
-
-		elasticSearchService = new ElasticSearchClient(httpService, config);
-
-		for (int i = 0; i < 10; i++) {
-			elasticSearchService.index("foo", "bar", UUID.randomUUID().toString(), new Bar(), true);
-		}
+//		URLFetchService urlFetchService = URLFetchServiceFactory.getURLFetchService();
+//		httpService = new HttpServiceImpl(urlFetchService);
+//
+//		ElasticSearchConfig config = new ElasticSearchConfig();
+//		config.setUrl("http://localhost:9200");
+//
+//		elasticSearchService = new ElasticSearchClient(httpService, config);
+//
+//		for (int i = 0; i < 10; i++) {
+//			elasticSearchService.index("foo", "bar", UUID.randomUUID().toString(), new Bar(), true);
+//		}
 	}
 
 	@After
 	public void after() throws Exception {
-		elasticSearchService.delete("foo");
+//		elasticSearchService.delete("foo");
 	}
 
 	@Test
 	@Ignore
 	public void shouldIndexGetAndDeleteDocument() throws Exception {
-		Bar data = new Bar();
-
-		String id = UUID.randomUUID().toString();
-		IndexResult indexResult = elasticSearchService.index("foo", "bar", id, data);
-		assertThat(indexResult, is(notNullValue()));
-		assertThat(indexResult.getIndex(), is("foo"));
-		assertThat(indexResult.getType(), is("bar"));
-		assertThat(indexResult.isCreated(), is(true));
-
-		Hit<Bar> getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
-		assertThat(getResult, is(notNullValue()));
-		assertThat(getResult.getId(), is(id));
-		assertThat(getResult.isFound(), is(true));
-		assertThat(getResult.getSource().baz, is("qux"));
-
-		Result deleteResult = elasticSearchService.delete("foo", "bar", id);
-		assertThat(deleteResult, is(notNullValue()));
-		assertThat(deleteResult.isFound(), is(true));
-
-		getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
-		assertThat(getResult.getId(), is(id));
-		assertThat(getResult.isFound(), is(false));
+//		Bar data = new Bar();
+//
+//		String id = UUID.randomUUID().toString();
+//		IndexResult indexResult = elasticSearchService.index("foo", "bar", id, data);
+//		assertThat(indexResult, is(notNullValue()));
+//		assertThat(indexResult.getIndex(), is("foo"));
+//		assertThat(indexResult.getType(), is("bar"));
+//		assertThat(indexResult.isCreated(), is(true));
+//
+//		Hit<Bar> getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
+//		assertThat(getResult, is(notNullValue()));
+//		assertThat(getResult.getId(), is(id));
+//		assertThat(getResult.isFound(), is(true));
+//		assertThat(getResult.getSource().baz, is("qux"));
+//
+//		Result deleteResult = elasticSearchService.delete("foo", "bar", id);
+//		assertThat(deleteResult, is(notNullValue()));
+//		assertThat(deleteResult.isFound(), is(true));
+//
+//		getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
+//		assertThat(getResult.getId(), is(id));
+//		assertThat(getResult.isFound(), is(false));
 	}
 
 	@Test
 	@Ignore
 	public void shouldPerformSearch() {
-		SearchResult<Bar> result = elasticSearchService.search(Bar.class, "foo", "bar", null);
-		assertThat(result, is(notNullValue()));
+//		ClientResponse<Bar> result = elasticSearchService.search(Bar.class, "foo", "bar", null);
+//		assertThat(result, is(notNullValue()));
 	}
 
 	class Bar {

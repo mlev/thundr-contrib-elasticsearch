@@ -17,9 +17,11 @@
  */
 package com.threewks.thundr.elasticsearch.gae.repository;
 
-import com.google.common.collect.Lists;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
-import com.threewks.thundr.elasticsearch.gae.model.*;
+import com.threewks.thundr.elasticsearch.gae.action.*;
+import com.threewks.thundr.elasticsearch.gae.model.ClientResponse;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,19 +42,36 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public E load(String id) {
-		Hit<E> result = client.get(entityType, index, typeName, id);
-		return result.getSource();
+		Get get = new Get.Builder()
+				.index(index)
+				.type(typeName)
+				.id(id)
+				.build();
+		ClientResponse response = client.execute(get);
+		return response.getSourceAsType(entityType);
 	}
 
 	public boolean save(E entity) {
-		IndexResult result;
 		String id = entity.getId();
+
+		Action action;
 		if (load(id) == null) {
-			result = client.index(index, typeName, id, entity);
+			action = new Index.Builder()
+					.index(index)
+					.type(typeName)
+					.id(id)
+					.document(entity)
+					.build();
 		} else {
-			result = client.update(index, typeName, id, entity);
+			action = new Update.Builder()
+					.index(index)
+					.type(typeName)
+					.id(id)
+					.document(entity)
+					.build();
 		}
-		return result.isCreated();
+		ClientResponse response = client.execute(action);
+		return response.getJsonResponse().get("created").getAsBoolean();
 	}
 
 	public void save(E... entities) {
@@ -67,7 +86,12 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public void delete(E entity) {
-		client.delete(index, typeName, entity.getId());
+		Delete delete = new Delete.Builder()
+				.index(index)
+				.type(typeName)
+				.id(entity.getId())
+				.build();
+		client.execute(delete);
 	}
 
 	public void delete(E... entities) {
@@ -82,15 +106,21 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public List<E> search(final String query) {
-		return search(new Query(new QueryStringQuery(query, searchFields)));
+		QueryStringQueryBuilder builder = QueryBuilders.queryString(query);
+		for (String field : searchFields) {
+			builder.field(field);
+		}
+
+		Search search = new Search.Builder()
+				.index(index)
+				.type(typeName)
+				.query(builder)
+				.build();
+		return search(search);
 	}
 
-	public List<E> search(Query query) {
-		List<E> entities = Lists.newArrayList();
-		SearchResult<E> result = client.search(entityType, index, typeName, query);
-		for (Hit<E> hit : result.getHits().getHits()) {
-			entities.add(hit.getSource());
-		}
-		return entities;
+	public List<E> search(Search search) {
+		ClientResponse response = client.execute(search);
+		return response.getHitsAsType(entityType);
 	}
 }
