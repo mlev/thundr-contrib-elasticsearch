@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>thundr-gae-es</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <packaging>jar</packaging>
     <name>thundr-gae-es</name>
     <description>A Thundr module implementing an Elastic Search client for Google App Engine</description>
@@ -30,7 +30,7 @@
         <connection>scm:git:https://github.com/3wks/${project.name}</connection>
         <developerConnection>scm:git:https://github.com/3wks/${project.name}</developerConnection>
         <url>https://github.com/3wks/${project.name}</url>
-        <tag>HEAD</tag>
+        <tag>0.0.2</tag>
     </scm>
 
     <repositories>
