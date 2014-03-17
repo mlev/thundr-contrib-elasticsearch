@@ -27,11 +27,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
-	private final ElasticSearchClient client;
-	private final String index;
-	private final Class<E> entityType;
-	private final List<String> searchFields;
-	private final String typeName;
+	protected final ElasticSearchClient client;
+	protected final String index;
+	protected final Class<E> entityType;
+	protected final List<String> searchFields;
+	protected final String typeName;
 
 	public ElasticSearchRepository(ElasticSearchClient client, String index, Class<E> entityType, List<String> searchFields) {
 		this.client = client;
@@ -70,8 +70,8 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 					.document(entity)
 					.build();
 		}
-		ClientResponse response = client.execute(action);
-		return response.getJsonResponse().get("created").getAsBoolean();
+		client.execute(action);
+		return action instanceof Index;
 	}
 
 	public void save(E... entities) {
