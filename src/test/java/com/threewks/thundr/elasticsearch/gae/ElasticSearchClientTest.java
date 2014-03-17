@@ -75,7 +75,6 @@ public class ElasticSearchClientTest {
 				.build();
 		ClientResponse clientResponse = client.execute(get);
 		verify(httpService).request(BaseUrl + "/foo/bar/1");
-		verify(request).parameters(anyMap());
 		verify(request, times(0)).body(anyObject());
 
 		Foo foo = clientResponse.getSourceAsType(Foo.class);
@@ -107,7 +106,6 @@ public class ElasticSearchClientTest {
 				.build();
 		ClientResponse clientResponse = client.execute(index);
 		verify(httpService).request(BaseUrl + "/foo/bar/1");
-		verify(request).parameters(anyMap());
 		verify(request, times(0)).body(anyObject());
 
 		Foo foo = clientResponse.getSourceAsType(Foo.class);

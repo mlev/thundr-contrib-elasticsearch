@@ -17,6 +17,7 @@
  */
 package com.threewks.thundr.elasticsearch.gae;
 
+import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -28,7 +29,11 @@ import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 import com.threewks.thundr.http.service.HttpService;
 
+import java.util.List;
 import java.util.Map;
+
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.join;
 
 public class ElasticSearchClient {
 	private final HttpService httpService;
@@ -54,11 +59,11 @@ public class ElasticSearchClient {
 	}
 
 	public ClientResponse execute(Action action) {
-		String url = String.format("%s%s", config.getUrl(), action.getPath());
+		String url = format("%s%s", config.getUrl(), action.getPath());
+		url = applyParametersIfProvided(url, action.getParameters());
 
 		HttpRequest request = httpService.request(url);
 		applyAuthIfRequired(request);
-		applyParametersIfProvided(request, action.getParameters());
 		appendDataToRequest(request, action.getData());
 
 		HttpResponse response = action.execute(request);
@@ -73,11 +78,17 @@ public class ElasticSearchClient {
 		return request;
 	}
 
-	private HttpRequest applyParametersIfProvided(HttpRequest request, Map<String, Object> parameters) {
-		if (parameters != null) {
-			request = request.parameters(parameters);
+	private String applyParametersIfProvided(String url, Map<String, Object> parameters) {
+		if (parameters == null || parameters.size() == 0) {
+			return url;
 		}
-		return request;
+
+		List<String> queryString = Lists.newArrayList();
+		for (String key : parameters.keySet()) {
+			queryString.add(format("%s=%s", key, String.valueOf(parameters.get(key))));
+		}
+
+		return url + "?" + join(queryString, "&");
 	}
 
 	private HttpRequest appendDataToRequest(HttpRequest request, Object data) {

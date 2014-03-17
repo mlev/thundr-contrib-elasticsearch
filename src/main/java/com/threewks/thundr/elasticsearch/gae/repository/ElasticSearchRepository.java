@@ -27,6 +27,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
+	public static final int SearchStartIndex = 0;
+	public static final int DefaultResultSizeLimit = 10;
+
 	protected final ElasticSearchClient client;
 	protected final String index;
 	protected final Class<E> entityType;
@@ -106,6 +109,10 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public List<E> search(final String query) {
+		return search(query, SearchStartIndex, DefaultResultSizeLimit);
+	}
+
+	public List<E> search(final String query, int start, int limit) {
 		QueryStringQueryBuilder builder = QueryBuilders.queryString(query);
 		for (String field : searchFields) {
 			builder.field(field);
@@ -114,6 +121,8 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 		Search search = new Search.Builder()
 				.index(index)
 				.type(typeName)
+				.from(start)
+				.size(limit)
 				.query(builder)
 				.build();
 		return search(search);
