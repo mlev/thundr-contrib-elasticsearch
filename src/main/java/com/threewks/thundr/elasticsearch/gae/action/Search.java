@@ -17,6 +17,8 @@
  */
 package com.threewks.thundr.elasticsearch.gae.action;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 import org.elasticsearch.index.query.BaseQueryBuilder;
@@ -32,25 +34,29 @@ public class Search extends BaseAction {
 	}
 
 	public static class Builder extends BaseBuilder<Search, Builder> {
+		private Integer timeout;
+		private Integer from;
+		private Integer size;
+		private String searchType;
 		private BaseQueryBuilder queryBuilder;
 
 		public Builder timeout(int millis) {
-			parameter("timeout", millis);
+			timeout = millis;
 			return this;
 		}
 
 		public Builder from(int index) {
-			parameter("from", index);
+			from = index;
 			return this;
 		}
 
 		public Builder size(int size) {
-			parameter("size", size);
+			this.size = size;
 			return this;
 		}
 
 		public Builder searchType(String type) {
-			parameter("search_type", type);
+			searchType = type;
 			return this;
 		}
 
@@ -77,7 +83,16 @@ public class Search extends BaseAction {
 		}
 
 		private String buildQuery() {
-			return String.format("{\"query\":%s}", queryBuilder.toString());
+			JsonObject query = new JsonObject();
+
+			if (timeout != null) query.addProperty("timeout", timeout);
+			if (from != null) query.addProperty("from", from);
+			if (size != null) query.addProperty("size", size);
+			if (searchType != null) query.addProperty("search_type", searchType);
+
+			query.add("query", new JsonParser().parse(queryBuilder.toString()).getAsJsonObject());
+
+			return query.toString();
 		}
 	}
 }
