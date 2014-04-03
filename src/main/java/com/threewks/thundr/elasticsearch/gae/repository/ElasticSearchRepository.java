@@ -17,6 +17,7 @@
  */
 package com.threewks.thundr.elasticsearch.gae.repository;
 
+import com.google.common.collect.Maps;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
 import com.threewks.thundr.elasticsearch.gae.action.*;
 import com.threewks.thundr.elasticsearch.gae.model.ClientResponse;
@@ -25,6 +26,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
 	public static final int SearchStartIndex = 0;
@@ -73,6 +75,7 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 					.document(entity)
 					.build();
 		}
+
 		client.execute(action);
 		return action instanceof Index;
 	}
@@ -82,10 +85,17 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public void save(List<E> entities) {
-		// TODO use bulk API for better performance
+		Map<String, Object> documents = Maps.newLinkedHashMap();
 		for (E entity : entities) {
-			save(entity);
+			documents.put(entity.getId(), entity);
 		}
+
+		Action action = new BulkIndex.Builder()
+				.index(index)
+				.type(typeName)
+				.documents(documents)
+				.build();
+		client.execute(action);
 	}
 
 	public void delete(E entity) {

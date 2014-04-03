@@ -18,47 +18,30 @@
 package com.threewks.thundr.elasticsearch.gae.action;
 
 import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
+import com.google.gson.GsonBuilder;
+import com.threewks.thundr.logger.Logger;
 
-import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public abstract class BaseBuilder<T, B> {
-	protected String index;
-	protected String type;
-	protected String id;
-	protected Map<String, Object> parameters = Maps.newHashMap();
+public abstract class BaseBulkBuilder<T, B> extends BaseBuilder<T, B> {
+	protected GsonBuilder gsonBuilder = new GsonBuilder();
+	protected String path = "/_bulk";
+	protected Map<String, Object> documents = Maps.newLinkedHashMap();
 
-	public B index(String index) {
-		this.index = index;
-		return (B) this;
-	}
-
-	public B type(String type) {
-		this.type = type;
-		return (B) this;
-	}
-
+	@Override
 	public B id(String id) {
-		this.id = id;
+		Logger.warn("Setting ID for bulk operations has no effect; ignoring.");
 		return (B) this;
 	}
 
-	public B parameter(String name, Object value) {
-		parameters.put(name, value);
+	public B document(String id, Object document) {
+		this.documents.put(id, document);
 		return (B) this;
 	}
 
-	public B parameters(Map<String, Object> parameters) {
-		this.parameters.putAll(parameters);
+	public B documents(Map<String, Object> documents) {
+		this.documents.putAll(documents);
 		return (B) this;
 	}
-
-	public B routing(List<String> routes) {
-		this.parameters.put("routing", StringUtils.join(routes, ","));
-		return (B) this;
-	}
-
-	public abstract T build();
 }
