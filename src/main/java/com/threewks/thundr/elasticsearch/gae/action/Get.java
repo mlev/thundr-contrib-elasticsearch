@@ -25,6 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Get extends BaseAction {
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private Get() {
 		super();
 	}

@@ -23,6 +23,10 @@ import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 
 public class BulkUpdate extends BaseAction {
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private BulkUpdate() {
 		super();
 	}
@@ -41,11 +45,11 @@ public class BulkUpdate extends BaseAction {
 
 		@Override
 		public BulkUpdate build() {
-			BulkUpdate index = new BulkUpdate();
-			index.path = path;
-			index.parameters = parameters;
-			index.data = buildData();
-			return index;
+			BulkUpdate bulkUpdate = new BulkUpdate();
+			bulkUpdate.path = path;
+			bulkUpdate.parameters = parameters;
+			bulkUpdate.data = buildData();
+			return bulkUpdate;
 		}
 
 		private String buildData() {

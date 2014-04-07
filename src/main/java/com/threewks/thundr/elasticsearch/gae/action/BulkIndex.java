@@ -23,6 +23,10 @@ import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 
 public class BulkIndex extends BaseAction {
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private BulkIndex() {
 		super();
 	}
@@ -33,6 +37,11 @@ public class BulkIndex extends BaseAction {
 	}
 
 	public static class Builder extends BaseBulkBuilder<BulkIndex, BulkIndex.Builder> {
+
+		public Builder create() {
+			parameter("create", true);
+			return this;
+		}
 
 		public Builder refresh() {
 			parameter("refresh", true);

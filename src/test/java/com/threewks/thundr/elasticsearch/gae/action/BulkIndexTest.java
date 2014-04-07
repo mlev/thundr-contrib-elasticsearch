@@ -26,7 +26,7 @@ public class BulkIndexTest {
 
 	@Test
 	public void shouldGenerateBulkInsertForSingleItem() throws Exception {
-		BulkIndex bulkIndex = new BulkIndex.Builder()
+		BulkIndex bulkIndex = BulkIndex.create()
 				.index("foo")
 				.type("bar")
 				.document("1", "{\"baz\":123}")
@@ -40,7 +40,7 @@ public class BulkIndexTest {
 
 	@Test
 	public void shouldGenerateBulkInsertForMultipleItems() throws Exception {
-		BulkIndex bulkIndex = new BulkIndex.Builder()
+		BulkIndex bulkIndex = BulkIndex.create()
 				.index("foo")
 				.type("bar")
 				.document("1", "{\"baz\":123}")

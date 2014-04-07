@@ -24,6 +24,10 @@ import com.threewks.thundr.http.service.HttpResponse;
 import org.elasticsearch.index.query.BaseQueryBuilder;
 
 public class Search extends BaseAction {
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private Search() {
 		super();
 	}

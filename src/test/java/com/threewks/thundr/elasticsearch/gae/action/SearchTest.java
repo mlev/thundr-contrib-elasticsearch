@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
 public class SearchTest {
 	@Test
 	public void shouldBuildSimpleSearch() throws Exception {
-		Search search = new Search.Builder()
+		Search search = Search.create()
 				.index("foo")
 				.type("bar")
 				.query(QueryBuilders.termQuery("hello", "world"))
@@ -38,7 +38,7 @@ public class SearchTest {
 
 	@Test
 	public void shouldBuildSimpleSearchWithPagingParameters() throws Exception {
-		Search search = new Search.Builder()
+		Search search = Search.create()
 				.from(0)
 				.size(100)
 				.query(QueryBuilders.termQuery("hello", "world"))

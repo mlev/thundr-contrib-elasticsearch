@@ -21,6 +21,10 @@ import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 
 public class Update extends BaseAction {
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private Update() {
 		super();
 	}

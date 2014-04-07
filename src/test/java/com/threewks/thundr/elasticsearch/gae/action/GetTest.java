@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 public class GetTest {
 	@Test
 	public void shouldBuildAction() throws Exception {
-		Get get = new Get.Builder().index("foo").type("bar").id("1").build();
+		Get get = Get.create().index("foo").type("bar").id("1").build();
 		assertThat(get.getPath(), is("/foo/bar/1"));
 		assertThat(get.getParameters().size(), is(0));
 		assertThat(get.getData(), is(nullValue()));
@@ -36,7 +36,7 @@ public class GetTest {
 
 	@Test
 	public void shouldBuildActionWithParameters() throws Exception {
-		Get get = new Get.Builder().index("foo").type("bar").id("1").parameter("test", "hi").build();
+		Get get = Get.create().index("foo").type("bar").id("1").parameter("test", "hi").build();
 		assertThat(get.getPath(), is("/foo/bar/1"));
 		assertThat(get.getParameters().size(), is(1));
 		assertThat(get.getParameters(), hasEntry("test", (Object) "hi"));
@@ -45,7 +45,7 @@ public class GetTest {
 
 	@Test
 	public void shouldBuildActionWithFields() throws Exception {
-		Get get = new Get.Builder().index("foo").type("bar").id("1").fields("f1", "f2").build();
+		Get get = Get.create().index("foo").type("bar").id("1").fields("f1", "f2").build();
 		assertThat(get.getPath(), is("/foo/bar/1"));
 		assertThat(get.getParameters().size(), is(1));
 		assertThat(get.getParameters(), hasEntry("fields", (Object) "f1,f2"));
@@ -54,7 +54,7 @@ public class GetTest {
 
 	@Test
 	public void shouldCallRequestGet() throws Exception {
-		Get get = new Get.Builder().build();
+		Get get = Get.create().build();
 
 		HttpRequest request = mock(HttpRequest.class);
 		get.execute(request);

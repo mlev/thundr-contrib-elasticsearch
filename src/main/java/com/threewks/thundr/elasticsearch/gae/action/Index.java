@@ -19,18 +19,30 @@ package com.threewks.thundr.elasticsearch.gae.action;
 
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class Index extends BaseAction {
+	protected boolean idSet = false;
+
+	public static Builder create() {
+		return new Builder();
+	}
+
 	private Index() {
 		super();
 	}
 
 	@Override
 	public HttpResponse execute(HttpRequest request) {
-		return request.put();
+		return (idSet) ? request.put() : request.post();  // auto-generate ID if not set via POST
 	}
 
 	public static class Builder extends BaseBuilder<Index, Builder> {
+		private static final DateTimeFormatter isoFormat = ISODateTimeFormat.dateTime();
+
 		private Object document;
 
 		public Builder document(Object document) {
@@ -38,8 +50,53 @@ public class Index extends BaseAction {
 			return this;
 		}
 
+		public Builder version(String version) {
+			parameter("version", version);
+			return this;
+		}
+
+		public Builder versionType(String type) {
+			parameter("version_type", type);
+			return this;
+		}
+
+		public Builder operationType(String type) {
+			parameter("operation_type", type);
+			return this;
+		}
+
+		public Builder parent(String id) {
+			parameter("parent", id);
+			return this;
+		}
+
+		public Builder timestamp(DateTime dateTime) {
+			parameter("timestamp", isoFormat.print(dateTime));
+			return this;
+		}
+
+		public Builder ttl(String value) {
+			parameter("ttl", value);
+			return this;
+		}
+
+		public Builder consistency(String value) {
+			parameter("consistency", value);
+			return this;
+		}
+
+		public Builder replication(String value) {
+			parameter("replication", value);
+			return this;
+		}
+
 		public Builder refresh() {
 			parameter("refresh", true);
+			return this;
+		}
+
+		public Builder timeout(String value) {
+			parameter("timeout", value);
 			return this;
 		}
 
@@ -49,6 +106,7 @@ public class Index extends BaseAction {
 			index.path = buildPath();
 			index.parameters = parameters;
 			index.data = document;
+			index.idSet = !StringUtils.isEmpty(id);
 			return index;
 		}
 
