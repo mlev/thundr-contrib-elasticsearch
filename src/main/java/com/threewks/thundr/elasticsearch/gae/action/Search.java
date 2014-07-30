@@ -17,11 +17,12 @@
  */
 package com.threewks.thundr.elasticsearch.gae.action;
 
+import org.elasticsearch.index.query.BaseQueryBuilder;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
-import org.elasticsearch.index.query.BaseQueryBuilder;
 
 public class Search extends BaseAction {
 	public static Builder create() {
@@ -43,6 +44,7 @@ public class Search extends BaseAction {
 		private Integer size;
 		private String searchType;
 		private BaseQueryBuilder queryBuilder;
+		private String jsonQuery;
 
 		public Builder timeout(int millis) {
 			timeout = millis;
@@ -65,7 +67,14 @@ public class Search extends BaseAction {
 		}
 
 		public Builder query(BaseQueryBuilder queryBuilder) {
+			this.jsonQuery = null;
 			this.queryBuilder = queryBuilder;
+			return this;
+		}
+
+		public Builder query(String jsonQuery) {
+			this.queryBuilder = null;
+			this.jsonQuery = jsonQuery;
 			return this;
 		}
 
@@ -81,7 +90,8 @@ public class Search extends BaseAction {
 		private String buildPath() {
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("/" + index);
-			if (type != null) stringBuilder.append("/" + type);
+			if (type != null)
+				stringBuilder.append("/" + type);
 			stringBuilder.append("/_search");
 			return stringBuilder.toString();
 		}
@@ -89,14 +99,25 @@ public class Search extends BaseAction {
 		private String buildQuery() {
 			JsonObject query = new JsonObject();
 
-			if (timeout != null) query.addProperty("timeout", timeout);
-			if (from != null) query.addProperty("from", from);
-			if (size != null) query.addProperty("size", size);
-			if (searchType != null) query.addProperty("search_type", searchType);
+			if (timeout != null)
+				query.addProperty("timeout", timeout);
+			if (from != null)
+				query.addProperty("from", from);
+			if (size != null)
+				query.addProperty("size", size);
+			if (searchType != null)
+				query.addProperty("search_type", searchType);
 
-			query.add("query", new JsonParser().parse(queryBuilder.toString()).getAsJsonObject());
+			query.add("query", new JsonParser().parse(getQueryAsJsonString()).getAsJsonObject());
 
 			return query.toString();
+		}
+
+		private String getQueryAsJsonString() {
+			if (queryBuilder != null) {
+				return queryBuilder.toString();
+			}
+			return jsonQuery;
 		}
 	}
 }
