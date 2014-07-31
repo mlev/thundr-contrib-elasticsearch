@@ -17,6 +17,10 @@
  */
 package com.threewks.thundr.elasticsearch.gae.action;
 
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.common.xcontent.ToXContent;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.BaseQueryBuilder;
 
 import com.google.gson.JsonObject;
@@ -115,9 +119,21 @@ public class Search extends BaseAction {
 
 		private String getQueryAsJsonString() {
 			if (queryBuilder != null) {
-				return queryBuilder.toString();
+				return queryToString(queryBuilder);
 			}
 			return jsonQuery;
 		}
 	}
+
+	public static String queryToString(BaseQueryBuilder query) {
+		try {
+			XContentBuilder builder = new XContentBuilder(JsonXContent.jsonXContent, new BasicBytesStream(4096));
+			builder.prettyPrint();
+			query.toXContent(builder, ToXContent.EMPTY_PARAMS);
+			return builder.string();
+		} catch (Exception e) {
+			throw new ElasticsearchException("Failed to build query", e);
+		}
+	}
+
 }

@@ -19,7 +19,13 @@ package com.threewks.thundr.elasticsearch.gae.repository;
 
 import com.google.common.collect.Maps;
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
-import com.threewks.thundr.elasticsearch.gae.action.*;
+import com.threewks.thundr.elasticsearch.gae.action.Action;
+import com.threewks.thundr.elasticsearch.gae.action.BulkIndex;
+import com.threewks.thundr.elasticsearch.gae.action.Delete;
+import com.threewks.thundr.elasticsearch.gae.action.Get;
+import com.threewks.thundr.elasticsearch.gae.action.Index;
+import com.threewks.thundr.elasticsearch.gae.action.Search;
+import com.threewks.thundr.elasticsearch.gae.action.Update;
 import com.threewks.thundr.elasticsearch.gae.model.ClientResponse;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -123,6 +129,7 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public List<E> search(final String query, int start, int limit) {
+		
 		QueryStringQueryBuilder builder = QueryBuilders.queryString(query);
 		for (String field : searchFields) {
 			builder.field(field);
