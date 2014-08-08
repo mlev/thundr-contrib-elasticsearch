@@ -1,0 +1,37 @@
+{
+	"took": 2,
+	"timed_out": false,
+	"_shards": {
+		"total": 5,
+		"successful": 5,
+		"failed": 0
+	},
+	"hits": {
+		"total": 108,
+		"max_score": 1.9162908,
+		"hits": [
+			{
+				"_index": "users",
+				"_type": "user",
+				"_id": "1",
+				"_score": 1.9162908,
+				"_source": {
+					"id": "1",
+					"firstName": "Homer",
+					"lastName": "Simpson"
+				}
+			},
+			{
+				"_index": "users",
+				"_type": "user",
+				"_id": "2",
+				"_score": 1.9162908,
+				"_source": {
+					"id": "2",
+					"firstName": "Bart",
+					"lastName": "Simpson"
+				}
+			}
+		]
+	}
+}

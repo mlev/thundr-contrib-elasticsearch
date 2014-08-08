@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ClientResponse {
+
 	private final Gson gson;
 	private final JsonObject jsonObject;
 
@@ -37,15 +38,50 @@ public class ClientResponse {
 		this.jsonObject = jsonObject;
 	}
 
+	/**
+	 * Get the raw JSON response returned by the search.
+	 *
+	 * @return a {@link JsonObject} containing the response.
+	 */
 	public JsonObject getJsonResponse() {
 		return jsonObject;
 	}
 
+	/**
+	 * Get the total number of hits returned.
+	 *
+	 * @return the number of hits.
+	 */
+	public long getTotalHits() {
+		if (jsonObject != null && jsonObject.has("hits")) {
+			JsonObject hits = jsonObject.getAsJsonObject("hits");
+			if (hits != null) {
+				return hits.get("total").getAsLong();
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Get the source (original JSON document) as the given type.
+	 *
+	 * @param type the type to return.
+	 * @param <T> generic type.
+	 * @return the source object.
+	 */
 	public <T> T getSourceAsType(Class<T> type) {
 		String source = getSourceAsJson();
 		return (source == null) ? null : gson.fromJson(getSourceAsJson(), type);
 	}
 
+	/**
+	 * Get the source (original JSON document) as a list of the given type.
+	 *
+	 * @param type the type to return in the list.
+	 * @param <T> generic type.
+	 * @return the source JSON as a list.
+	 */
 	public <T> List<T> getSourceAsListOfType(Class<T> type) {
 		String source = getSourceAsJson();
 		if (source == null) {
@@ -54,6 +90,13 @@ public class ClientResponse {
 		return gson.fromJson(source, new ListOfType<T>(type));
 	}
 
+	/**
+	 * Get the hits (search results) as a list of the given type..
+	 *
+	 * @param type the type of objects to return in the list.
+	 * @param <T> generic type
+	 * @return a list of results.
+	 */
 	public <T> List<T> getHitsAsType(Class<T> type) {
 		List<T> hits = Lists.newArrayList();
 		if (!jsonObject.has("hits")) {
@@ -61,7 +104,9 @@ public class ClientResponse {
 		}
 
 		JsonObject jsonHits = jsonObject.get("hits").getAsJsonObject();
-		if (jsonHits == null) return hits;
+		if (jsonHits == null) {
+			return hits;
+		}
 
 		Iterator<JsonElement> iterator = jsonHits.get("hits").getAsJsonArray().iterator();
 		while (iterator.hasNext()) {
@@ -73,7 +118,7 @@ public class ClientResponse {
 		return hits;
 	}
 
-	protected String getSourceAsJson() {
+	private String getSourceAsJson() {
 		JsonElement jsonElement = jsonObject.get("_source");
 		return (jsonElement == null) ? null : jsonElement.toString();
 	}
@@ -97,4 +142,5 @@ public class ClientResponse {
 			return null;
 		}
 	}
+
 }

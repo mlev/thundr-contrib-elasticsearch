@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
+
 	public static final int SearchStartIndex = 0;
 	public static final int DefaultResultSizeLimit = 10;
 
@@ -148,5 +149,9 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	public List<E> search(Search search) {
 		ClientResponse response = client.execute(search);
 		return response.getHitsAsType(entityType);
+	}
+
+	public ClientResponse executeSearch(Search search) {
+		return client.execute(search);
 	}
 }

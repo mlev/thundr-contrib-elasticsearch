@@ -1,0 +1,12 @@
+{
+	"_index": "users",
+	"_type": "user",
+	"_id": "1",
+	"_version": 1,
+	"found": true,
+	"_source": {
+		"id": "1",
+		"firstName": "Homer",
+		"lastName": "Simpson"
+	}
+}
