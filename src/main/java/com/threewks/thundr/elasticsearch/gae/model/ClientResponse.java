@@ -17,21 +17,27 @@
  */
 package com.threewks.thundr.elasticsearch.gae.model;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
+import com.google.gson.reflect.TypeToken;
 
 public class ClientResponse {
 
+	private static final Type MAP_TYPE_TOKEN = new TypeToken<Map<String, List<Object>>>() {
+	}.getType();
+
 	private final Gson gson;
 	private final JsonObject jsonObject;
+	private Type mapType;
 
 	public ClientResponse(Gson gson, JsonObject jsonObject) {
 		this.gson = gson;
@@ -116,6 +122,33 @@ public class ClientResponse {
 		}
 
 		return hits;
+	}
+
+	public List<Map<String, List<Object>>> getFieldsAsMap() {
+
+		List<Map<String, List<Object>>> results = new ArrayList<Map<String, List<Object>>>();
+		if (!jsonObject.has("hits")) {
+			return results;
+		}
+
+		JsonObject hits = jsonObject.get("hits").getAsJsonObject();
+		if (hits == null) {
+			return results;
+		}
+
+		for (JsonElement jsonElement : hits.get("hits").getAsJsonArray()) {
+			JsonObject hit = jsonElement.getAsJsonObject();
+			if (hit.has("fields")) {
+				JsonObject fields = hit.get("fields").getAsJsonObject();
+				if (fields != null) {
+					String json = gson.toJson(fields);
+					Map<String, List<Object>> hitFields = gson.fromJson(json, MAP_TYPE_TOKEN);
+					results.add(hitFields);
+				}
+			}
+		}
+
+		return results;
 	}
 
 	private String getSourceAsJson() {

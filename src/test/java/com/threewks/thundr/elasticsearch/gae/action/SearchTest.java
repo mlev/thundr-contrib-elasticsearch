@@ -20,6 +20,8 @@ package com.threewks.thundr.elasticsearch.gae.action;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -45,5 +47,15 @@ public class SearchTest {
 				.build();
 
 		assertThat((String) search.getData(), is("{\"from\":0,\"size\":100,\"query\":{\"term\":{\"hello\":\"world\"}}}"));
+	}
+
+	@Test
+	public void shouldBuildSimpleSearchWithFields() throws Exception {
+		Search search = Search.create()
+				.query(QueryBuilders.termQuery("hello", "world"))
+				.fields(Arrays.asList("field1", "field2"))
+				.build();
+
+		assertThat((String) search.getData(), is("{\"fields\":[\"field1\",\"field2\"],\"query\":{\"term\":{\"hello\":\"world\"}}}"));
 	}
 }

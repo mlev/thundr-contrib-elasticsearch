@@ -17,14 +17,19 @@
  */
 package com.threewks.thundr.elasticsearch.gae.action;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.BaseQueryBuilder;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 
@@ -47,6 +52,7 @@ public class Search extends BaseAction {
 		private Integer from;
 		private Integer size;
 		private String searchType;
+		private List<String> fields = new ArrayList<String>();
 		private BaseQueryBuilder queryBuilder;
 		private String jsonQuery;
 
@@ -67,6 +73,11 @@ public class Search extends BaseAction {
 
 		public Builder searchType(String type) {
 			searchType = type;
+			return this;
+		}
+
+		public Builder fields(List<String> fields) {
+			this.fields = fields;
 			return this;
 		}
 
@@ -103,14 +114,25 @@ public class Search extends BaseAction {
 		private String buildQuery() {
 			JsonObject query = new JsonObject();
 
-			if (timeout != null)
+			if (timeout != null) {
 				query.addProperty("timeout", timeout);
-			if (from != null)
+			}
+			if (from != null) {
 				query.addProperty("from", from);
-			if (size != null)
+			}
+			if (size != null) {
 				query.addProperty("size", size);
-			if (searchType != null)
+			}
+			if (searchType != null) {
 				query.addProperty("search_type", searchType);
+			}
+			if (!fields.isEmpty()) {
+				JsonArray fieldsArray = new JsonArray();
+				for (String field : fields) {
+					fieldsArray.add(new JsonPrimitive(field));
+				}
+				query.add("fields", fieldsArray);
+			}
 
 			query.add("query", new JsonParser().parse(getQueryAsJsonString()).getAsJsonObject());
 
