@@ -17,7 +17,13 @@
  */
 package com.threewks.thundr.elasticsearch.gae;
 
-import com.google.common.collect.Lists;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.join;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -28,12 +34,6 @@ import com.threewks.thundr.http.ContentType;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 import com.threewks.thundr.http.service.HttpService;
-
-import java.util.List;
-import java.util.Map;
-
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.join;
 
 public class ElasticSearchClient {
 	private final HttpService httpService;
@@ -83,7 +83,7 @@ public class ElasticSearchClient {
 			return url;
 		}
 
-		List<String> queryString = Lists.newArrayList();
+		List<String> queryString = new ArrayList<String>();
 		for (String key : parameters.keySet()) {
 			queryString.add(format("%s=%s", key, String.valueOf(parameters.get(key))));
 		}

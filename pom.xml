@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
         <groupId>com.threewks.thundr</groupId>
         <artifactId>thundr-parent</artifactId>
         <version>3</version>
     </parent>
 
-    <artifactId>thundr-gae-es</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <artifactId>thundr-contrib-elasticsearch</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>thundr-gae-es</name>
-    <description>A Thundr module implementing an Elastic Search client for Google App Engine</description>
-    <url>http://3wks.github.com/thundr/</url>
+    <name>thundr-contrib-elasticsearch</name>
+    <description>A Thundr module implementing an Elastic Search client.</description>
+    <url>http://3wks.github.com/shanebell/thundr-contrib-elasticsearch</url>
 
     <organization>
         <name>3wks</name>
@@ -21,6 +22,11 @@
 
     <developers>
         <developer>
+            <id>shanebell</id>
+            <name>Shane Bell</name>
+            <email>shane@3wks.com.au</email>
+        </developer>
+        <developer>
             <id>kuhnza</id>
             <name>Dave Kuhn</name>
             <email>dave@3wks.com.au</email>
@@ -28,41 +34,32 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/3wks/${project.name}</connection>
-        <developerConnection>scm:git:https://github.com/3wks/${project.name}</developerConnection>
-        <url>https://github.com/3wks/${project.name}</url>
+        <connection>scm:git:https://github.com/shanebell/${project.name}</connection>
+        <developerConnection>scm:git:https://github.com/shanebell/${project.name}</developerConnection>
+        <url>https://github.com/shanebell/${project.name}</url>
         <tag>HEAD</tag>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>google-api-services</id>
-            <url>http://google-api-client-libraries.appspot.com/mavenrepo</url>
-        </repository>
-    </repositories>
-
     <properties>
-        <gae.version>1.8.9</gae.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <thundr.version>1.0.0</thundr.version>
+        <thundr.version>1.1.0</thundr.version>
     </properties>
 
     <dependencies>
-        <!-- thundr Dependency -->
+
+        <!-- Compile dependencies -->
         <dependency>
             <groupId>com.threewks.thundr</groupId>
-            <artifactId>thundr-gae</artifactId>
+            <artifactId>thundr</artifactId>
             <version>${thundr.version}</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+            <groupId>com.threewks.thundr</groupId>
+            <artifactId>thundr-http</artifactId>
+            <version>${thundr.version}</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
@@ -72,52 +69,27 @@
 
         <!-- Test Dependencies -->
         <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-labs</artifactId>
-            <version>${gae.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-stubs</artifactId>
-            <version>${gae.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-testing</artifactId>
-            <version>${gae.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.threewks.thundr</groupId>
-            <artifactId>thundr-gae</artifactId>
+            <artifactId>thundr-http-ning</artifactId>
             <version>${thundr.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -143,19 +115,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <archiveClasses>true</archiveClasses>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-maven-plugin</artifactId>
-                <version>${gae.version}</version>
             </plugin>
         </plugins>
     </build>

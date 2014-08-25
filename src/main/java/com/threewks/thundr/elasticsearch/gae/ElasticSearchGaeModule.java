@@ -17,27 +17,26 @@
  */
 package com.threewks.thundr.elasticsearch.gae;
 
-import com.google.appengine.api.urlfetch.URLFetchService;
-import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
-import com.threewks.thundr.gae.GaeModule;
+import com.threewks.thundr.exception.BaseException;
 import com.threewks.thundr.http.service.HttpService;
-import com.threewks.thundr.http.service.gae.HttpServiceImpl;
 import com.threewks.thundr.injection.BaseModule;
 import com.threewks.thundr.injection.UpdatableInjectionContext;
 import com.threewks.thundr.module.DependencyRegistry;
 
 public class ElasticSearchGaeModule extends BaseModule {
+
 	@Override
 	public void requires(DependencyRegistry dependencyRegistry) {
 		super.requires(dependencyRegistry);
-		dependencyRegistry.addDependency(GaeModule.class);
 	}
 
 	@Override
 	public void configure(UpdatableInjectionContext injectionContext) {
 		super.configure(injectionContext);
-		injectionContext.inject(URLFetchServiceFactory.getURLFetchService()).as(URLFetchService.class);
-		injectionContext.inject(HttpServiceImpl.class).as(HttpService.class);
+
+		if (injectionContext.get(HttpService.class) == null) {
+			throw new BaseException("Unable to find an implementation of %s", HttpService.class.getName());
+		}
 
 		ElasticSearchConfig config = new ElasticSearchConfig();
 		config.setUrl(injectionContext.get(String.class, "elasticSearchUrl"));

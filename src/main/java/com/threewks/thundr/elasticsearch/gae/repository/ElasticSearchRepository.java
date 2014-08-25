@@ -17,7 +17,14 @@
  */
 package com.threewks.thundr.elasticsearch.gae.repository;
 
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
 import com.threewks.thundr.elasticsearch.gae.action.Action;
 import com.threewks.thundr.elasticsearch.gae.action.BulkIndex;
@@ -27,12 +34,6 @@ import com.threewks.thundr.elasticsearch.gae.action.Index;
 import com.threewks.thundr.elasticsearch.gae.action.Search;
 import com.threewks.thundr.elasticsearch.gae.action.Update;
 import com.threewks.thundr.elasticsearch.gae.model.ClientResponse;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class ElasticSearchRepository<E extends RepositoryEntity> {
 
@@ -92,7 +93,7 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 	}
 
 	public void save(List<E> entities) {
-		Map<String, Object> documents = Maps.newLinkedHashMap();
+		Map<String, Object> documents = new LinkedHashMap<String, Object>();
 		for (E entity : entities) {
 			documents.put(entity.getId(), entity);
 		}

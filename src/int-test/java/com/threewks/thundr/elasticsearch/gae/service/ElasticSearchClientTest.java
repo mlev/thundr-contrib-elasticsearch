@@ -17,102 +17,77 @@
  */
 package com.threewks.thundr.elasticsearch.gae.service;
 
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import org.elasticsearch.node.Node;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.threewks.thundr.elasticsearch.gae.ElasticSearchClient;
-import com.threewks.thundr.gae.SetupAppengine;
-import com.threewks.thundr.http.service.HttpService;
-import org.junit.*;
+import com.threewks.thundr.elasticsearch.gae.ElasticSearchConfig;
+import com.threewks.thundr.elasticsearch.gae.action.Action;
+import com.threewks.thundr.elasticsearch.gae.action.Delete;
+import com.threewks.thundr.elasticsearch.gae.action.Get;
+import com.threewks.thundr.elasticsearch.gae.action.Index;
+import com.threewks.thundr.elasticsearch.gae.model.ClientResponse;
+import com.threewks.thundr.http.service.ning.HttpServiceNing;
 
 public class ElasticSearchClientTest {
-	private static Process process;
 
-	@Rule
-	public SetupAppengine setupAppengine = new SetupAppengine();
+	private static ElasticSearchClient elasticSearchClient;
+	private static Node node;
 
-	private HttpService httpService;
-	private ElasticSearchClient elasticSearchService;
-//
-//	@BeforeClass
-//	public static void beforeClass() throws URISyntaxException, IOException, InterruptedException {
-//		/*
-//		 * WARNING: this is a dirty, dirty hack to get around the fact that App Engine's Lucene jars
-//		 * conflict with Elastic Search's. This means we can't launch the embedded client which would
-//		 * make things much, much nicer...sigh.
-//		 */
-//
-//		URL resource = ElasticSearchClientTest.class.getResource("/elasticsearch-1.0.1/bin/elasticsearch");
-//	 	String command = Paths.get(resource.toURI()).toAbsolutePath().toString();
-//		ProcessBuilder processBuilder = new ProcessBuilder(command, "-Des.index.store.type=memory");
-//		process = processBuilder.start();
-//
-//		System.out.print("Waiting for elastic search instance to start..");
-//		BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//		while (!stdout.readLine().endsWith("started")) {
-//			System.out.print(".");
-//			Thread.sleep(1000);
-//		}
-//		System.out.println(".started.");
-//	}
-//
-//	@AfterClass
-//	public static void afterClass() {
-//		process.destroy();
-//	}
+	@BeforeClass
+	public static void beforeClass() {
+		node = nodeBuilder().local(true).node();
 
-	@Before
-	public void before() throws Exception {
-//		URLFetchService urlFetchService = URLFetchServiceFactory.getURLFetchService();
-//		httpService = new HttpServiceImpl(urlFetchService);
-//
-//		ElasticSearchConfig config = new ElasticSearchConfig();
-//		config.setUrl("http://localhost:9200");
-//
-//		elasticSearchService = new ElasticSearchClient(httpService, config);
-//
-//		for (int i = 0; i < 10; i++) {
-//			elasticSearchService.index("foo", "bar", UUID.randomUUID().toString(), new Bar(), true);
-//		}
+		ElasticSearchConfig config = new ElasticSearchConfig();
+		config.setUrl("http://localhost:9200");
+		elasticSearchClient = new ElasticSearchClient(new HttpServiceNing(), config);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (node != null) {
+			node.close();
+		}
 	}
 
 	@After
 	public void after() throws Exception {
-//		elasticSearchService.delete("foo");
+		Action action = new Delete.Builder().index("foo").build();
+		elasticSearchClient.execute(action);
 	}
 
 	@Test
-	@Ignore
-	public void shouldIndexGetAndDeleteDocument() throws Exception {
-//		Bar data = new Bar();
-//
-//		String id = UUID.randomUUID().toString();
-//		IndexResult indexResult = elasticSearchService.index("foo", "bar", id, data);
-//		assertThat(indexResult, is(notNullValue()));
-//		assertThat(indexResult.getIndex(), is("foo"));
-//		assertThat(indexResult.getType(), is("bar"));
-//		assertThat(indexResult.isCreated(), is(true));
-//
-//		Hit<Bar> getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
-//		assertThat(getResult, is(notNullValue()));
-//		assertThat(getResult.getId(), is(id));
-//		assertThat(getResult.isFound(), is(true));
-//		assertThat(getResult.getSource().baz, is("qux"));
-//
-//		Result deleteResult = elasticSearchService.delete("foo", "bar", id);
-//		assertThat(deleteResult, is(notNullValue()));
-//		assertThat(deleteResult.isFound(), is(true));
-//
-//		getResult = elasticSearchService.get(Bar.class, "foo", "bar", id);
-//		assertThat(getResult.getId(), is(id));
-//		assertThat(getResult.isFound(), is(false));
+	public void shouldIndexGetAndDeleteDocument() {
+
+		// INDEX
+		Index index = new Index.Builder().index("foo").type("bar").id("12345").document(new Bar()).build();
+		ClientResponse indexResponse = elasticSearchClient.execute(index);
+		assertThat(indexResponse.getJsonResponse().toString(), is("{\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":1,\"created\":true}"));
+
+		// GET
+		Get get = new Get.Builder().index("foo").type("bar").id("12345").build();
+		ClientResponse getResponse = elasticSearchClient.execute(get);
+		assertThat(getResponse.getJsonResponse().toString(), is("{\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":1,\"found\":true,\"_source\":{\"baz\":\"qux\"}}"));
+		assertThat(getResponse.getSourceAsType(Bar.class).baz, is("qux"));
+
+		// DELETE
+		Delete delete = new Delete.Builder().index("foo").type("bar").id("12345").build();
+		ClientResponse deleteResponse = elasticSearchClient.execute(delete);
+		assertThat(deleteResponse.getJsonResponse().toString(), is("{\"found\":true,\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":2}"));
+
+		// GET
+		ClientResponse getResponse2 = elasticSearchClient.execute(get);
+		assertThat(getResponse2.getJsonResponse().toString(), is("{\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"found\":false}"));
 	}
 
-	@Test
-	@Ignore
-	public void shouldPerformSearch() {
-//		ClientResponse<Bar> result = elasticSearchService.search(Bar.class, "foo", "bar", null);
-//		assertThat(result, is(notNullValue()));
-	}
-
-	class Bar {
+	private class Bar {
 		String baz = "qux";
 	}
 }

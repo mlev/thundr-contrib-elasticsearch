@@ -82,8 +82,8 @@ public class ElasticSearchClientTest {
 		assertThat(foo.baz, is("qux"));
 	}
 
-	@Test
 	@Ignore
+	@Test
 	public void shouldIndexDocument() throws Exception {
 		HttpResponse response = mock(HttpResponse.class);
 		when(response.getBody()).thenReturn("{" +

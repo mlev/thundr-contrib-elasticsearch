@@ -17,18 +17,18 @@
  */
 package com.threewks.thundr.elasticsearch.gae.action;
 
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("unchecked")
 public abstract class BaseBuilder<T, B> {
 	protected String index;
 	protected String type;
 	protected String id;
-	protected Map<String, Object> parameters = Maps.newHashMap();
+	protected Map<String, Object> parameters = new HashMap<String, Object>();
 
 	public B index(String index) {
 		this.index = index;
