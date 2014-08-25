@@ -1,4 +1,4 @@
-# Thundr Elastic Search Module for Google App Engine
+# Thundr Elastic Search Client
 
 ## To Do
 
@@ -11,4 +11,3 @@
 - [ ] Logging/tracing
 - [ ] Automatic entity mapping
 - [ ] Cluster support
-- [ ] Align with GAE datastore repository API??
