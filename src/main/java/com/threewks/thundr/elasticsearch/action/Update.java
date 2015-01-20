@@ -17,6 +17,7 @@
  */
 package com.threewks.thundr.elasticsearch.action;
 
+import com.threewks.thundr.elasticsearch.model.UpdateDocument;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 
@@ -38,7 +39,7 @@ public class Update extends BaseAction {
 		private Object document;
 
 		public Builder document(Object document) {
-			this.document = document;
+			this.document = new UpdateDocument(document);
 			return this;
 		}
 

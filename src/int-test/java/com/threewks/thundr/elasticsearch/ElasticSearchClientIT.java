@@ -18,23 +18,23 @@
 package com.threewks.thundr.elasticsearch;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import com.threewks.thundr.elasticsearch.action.*;
+import com.threewks.thundr.transformer.TransformerManager;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.threewks.thundr.elasticsearch.ElasticSearchClient;
-import com.threewks.thundr.elasticsearch.ElasticSearchConfig;
-import com.threewks.thundr.elasticsearch.action.Action;
-import com.threewks.thundr.elasticsearch.action.Delete;
-import com.threewks.thundr.elasticsearch.action.Get;
-import com.threewks.thundr.elasticsearch.action.Index;
 import com.threewks.thundr.elasticsearch.model.ClientResponse;
 import com.threewks.thundr.http.service.ning.HttpServiceNing;
 
@@ -47,12 +47,13 @@ public class ElasticSearchClientIT {
 	public static void beforeClass() {
 		Settings settings = ImmutableSettings.settingsBuilder()
 				.put("index.store.type", "memory")
+				.put("http.port", "9299")
 				.put("path.data", "target/elasticsearch/data").build();
 		node = NodeBuilder.nodeBuilder().loadConfigSettings(false).local(true).settings(settings).node().start();
 
 		ElasticSearchConfig config = new ElasticSearchConfig();
-		config.setUrl("http://localhost:9200");
-		elasticSearchClient = new ElasticSearchClient(new HttpServiceNing(), config);
+		config.setUrl("http://localhost:9299");
+		elasticSearchClient = new ElasticSearchClient(new HttpServiceNing(TransformerManager.createWithDefaults()), config);
 	}
 
 	@AfterClass
@@ -82,10 +83,24 @@ public class ElasticSearchClientIT {
 		assertThat(getResponse.getJsonResponse().toString(), is("{\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":1,\"found\":true,\"_source\":{\"baz\":\"qux\"}}"));
 		assertThat(getResponse.getSourceAsType(Bar.class).baz, is("qux"));
 
+		// UPDATE
+		Update update = new Update.Builder().index("foo").type("bar").id("12345").document(new Bar()).build();
+		ClientResponse updateResponse = elasticSearchClient.execute(update);
+		assertThat(updateResponse.getJsonResponse().toString(), is("{\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":2}"));
+
+		// SEARCH
+		node.client().admin().indices().prepareRefresh().execute().actionGet();
+		Search search = Search.create().index("foo").type("bar")
+				.query(QueryBuilders.termQuery("baz", "qux"))
+				.sort(SortBuilders.fieldSort("baz"))
+				.build();
+		ClientResponse searchResponse = elasticSearchClient.execute(search);
+		assertThat(searchResponse.getJsonResponse().toString(), containsString("\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\""));
+
 		// DELETE
 		Delete delete = new Delete.Builder().index("foo").type("bar").id("12345").build();
 		ClientResponse deleteResponse = elasticSearchClient.execute(delete);
-		assertThat(deleteResponse.getJsonResponse().toString(), is("{\"found\":true,\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":2}"));
+		assertThat(deleteResponse.getJsonResponse().toString(), is("{\"found\":true,\"_index\":\"foo\",\"_type\":\"bar\",\"_id\":\"12345\",\"_version\":3}"));
 
 		// GET
 		ClientResponse getResponse2 = elasticSearchClient.execute(get);

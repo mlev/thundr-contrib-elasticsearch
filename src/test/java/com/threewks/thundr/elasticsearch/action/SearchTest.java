@@ -18,6 +18,7 @@
 package com.threewks.thundr.elasticsearch.action;
 
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -57,5 +58,32 @@ public class SearchTest {
 				.build();
 
 		assertThat((String) search.getData(), is("{\"fields\":[\"field1\",\"field2\"],\"query\":{\"term\":{\"hello\":\"world\"}}}"));
+	}
+
+	@Test
+	public void shouldBuildSimpleSearchWithSort() throws Exception {
+		Search search = Search.create()
+				.index("foo")
+				.type("bar")
+				.query(QueryBuilders.termQuery("hello", "world"))
+				.sort(SortBuilders.fieldSort("xyz"))
+				.build();
+
+		assertThat(search.getPath(), is("/foo/bar/_search"));
+		assertThat((String) search.getData(), is("{\"sort\":[{\"xyz\":{}}],\"query\":{\"term\":{\"hello\":\"world\"}}}"));
+	}
+
+	@Test
+	public void shouldBuildSearchWithSortMode() throws Exception {
+		Search search = Search.create()
+				.index("foo")
+				.type("bar")
+				.query(QueryBuilders.termQuery("hello", "world"))
+				.sort(SortBuilders.fieldSort("_score"))
+				.sort(SortBuilders.fieldSort("xyz").sortMode("min"))
+				.build();
+
+		assertThat(search.getPath(), is("/foo/bar/_search"));
+		assertThat((String) search.getData(), is("{\"sort\":[{\"_score\":{}},{\"xyz\":{\"mode\":\"min\"}}],\"query\":{\"term\":{\"hello\":\"world\"}}}"));
 	}
 }

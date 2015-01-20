@@ -30,8 +30,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.threewks.thundr.elasticsearch.model.SortOptions;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
+import org.elasticsearch.search.sort.SortBuilder;
 
 public class Search extends BaseAction {
 	public static Builder create() {
@@ -52,6 +54,7 @@ public class Search extends BaseAction {
 		private Integer from;
 		private Integer size;
 		private String searchType;
+		private SortOptions sort = new SortOptions();
 		private List<String> fields = new ArrayList<String>();
 		private BaseQueryBuilder queryBuilder;
 		private String jsonQuery;
@@ -73,6 +76,11 @@ public class Search extends BaseAction {
 
 		public Builder searchType(String type) {
 			searchType = type;
+			return this;
+		}
+
+		public Builder sort(SortBuilder sortBuilder) {
+			this.sort.addSort(sortBuilder);
 			return this;
 		}
 
@@ -125,6 +133,9 @@ public class Search extends BaseAction {
 			}
 			if (searchType != null) {
 				query.addProperty("search_type", searchType);
+			}
+			if (sort.hasOptions()) {
+				query.add("sort", sort.asJson());
 			}
 			if (!fields.isEmpty()) {
 				JsonArray fieldsArray = new JsonArray();

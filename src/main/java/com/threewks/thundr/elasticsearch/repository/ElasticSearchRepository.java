@@ -126,6 +126,15 @@ public class ElasticSearchRepository<E extends RepositoryEntity> {
 		}
 	}
 
+	public void deleteAll() {
+		Delete delete = new Delete.Builder()
+				.index(index)
+				.type(typeName)
+				.query("*")
+				.build();
+		client.execute(delete);
+	}
+
 	public List<E> search(final String query) {
 		return search(query, SearchStartIndex, DefaultResultSizeLimit);
 	}

@@ -34,6 +34,7 @@ import com.threewks.thundr.http.ContentType;
 import com.threewks.thundr.http.service.HttpRequest;
 import com.threewks.thundr.http.service.HttpResponse;
 import com.threewks.thundr.http.service.HttpService;
+import com.threewks.thundr.json.GsonSupport;
 
 public class ElasticSearchClient {
 	private final HttpService httpService;
@@ -45,7 +46,7 @@ public class ElasticSearchClient {
 		this.httpService = httpService;
 		this.config = config;
 
-		gsonBuilder = new GsonBuilder();
+		gsonBuilder = GsonSupport.createBasicGsonBuilder();
 	}
 
 	/**
@@ -63,8 +64,8 @@ public class ElasticSearchClient {
 		url = applyParametersIfProvided(url, action.getParameters());
 
 		HttpRequest request = httpService.request(url);
-		applyAuthIfRequired(request);
-		appendDataToRequest(request, action.getData());
+		request = applyAuthIfRequired(request);
+		request = appendDataToRequest(request, action.getData());
 
 		HttpResponse response = action.execute(request);
 		return newSearchResponse(response.getBody());

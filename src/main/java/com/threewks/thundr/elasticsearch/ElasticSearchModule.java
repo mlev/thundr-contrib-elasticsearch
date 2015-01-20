@@ -23,7 +23,7 @@ import com.threewks.thundr.injection.BaseModule;
 import com.threewks.thundr.injection.UpdatableInjectionContext;
 import com.threewks.thundr.module.DependencyRegistry;
 
-public class ElasticSearchGaeModule extends BaseModule {
+public class ElasticSearchModule extends BaseModule {
 
 	@Override
 	public void requires(DependencyRegistry dependencyRegistry) {
